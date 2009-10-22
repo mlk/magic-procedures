@@ -34,7 +34,12 @@ public class IntBinding implements Binding {
 
 	@Override
 	public Class<?>[] worksWith() {
-		return new Class<?>[] { Integer.class };
+		return new Class<?>[] { Integer.class, int.class };
+	}
+
+	@Override
+	public int parameters() {
+		return 1;
 	}
 
 }

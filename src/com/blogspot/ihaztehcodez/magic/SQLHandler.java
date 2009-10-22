@@ -6,6 +6,7 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,14 +40,29 @@ class SQLHandler implements InvocationHandler {
 	public Object invoke(Object proxy, Method method, Object[] args)
 			throws Throwable {
 		DatabaseScript script = method.getAnnotation(DatabaseScript.class);
+		int currentBinding = 1;
 		Binding returnBinding = bindings.get(method.getReturnType());
+		List<Binding> paramBindings = new ArrayList<Binding>();
+		for (Class<?> paramClazz : method.getParameterTypes()) {
+			paramBindings.add(bindings.get(paramClazz));
+		}
+		
 		Connection connection = connectionProvider.get();
 		CallableStatement statement = null;
 		try {
 			statement = connection.prepareCall(script.value());
 			returnBinding.prepareGet(statement, 1);
+			currentBinding += returnBinding.parameters();
+			
+			for (int i = 0; i<paramBindings.size(); i++) {
+				
+				paramBindings.get(i).setValue(statement, currentBinding, args[i]);
+				currentBinding+=paramBindings.get(i).parameters();
+			}
 			
 			statement.execute();
+			
+			
 			
 			return returnBinding.getValue(statement, 1);
 		} finally {

@@ -28,4 +28,9 @@ public class StringBinding implements Binding {
 	public Class<?>[] worksWith() {
 		return new Class[] { String.class };
 	}
+
+	@Override
+	public int parameters() {
+		return 1;
+	}
 }

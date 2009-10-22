@@ -28,4 +28,9 @@ public class VoidBinding implements Binding {
 		return new Class<?>[] { void.class };
 	}
 
+	@Override
+	public int parameters() {
+		return 0;
+	}
+
 }

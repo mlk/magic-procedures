@@ -34,6 +34,11 @@ public class ByteBinding implements Binding {
 
 	@Override
 	public Class<?>[] worksWith() {
-		return new Class<?>[] { Byte.class };
+		return new Class<?>[] { Byte.class, byte.class };
+	}
+
+	@Override
+	public int parameters() {
+		return 1;
 	}
 }

@@ -33,4 +33,8 @@ public interface Binding {
 	
 	/** @return The types this binding can bind. */
 	Class<?>[] worksWith();
+	
+	/**@return The number of parameters this uses to retrieve the content.
+	 */
+	int parameters();
 }
