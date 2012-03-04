@@ -1,10 +1,10 @@
 package com.blogspot.ihaztehcodez.magic.binders;
 
+import com.blogspot.ihaztehcodez.magic.Binding;
+
 import java.sql.CallableStatement;
 import java.sql.SQLException;
 import java.sql.Types;
-
-import com.blogspot.ihaztehcodez.magic.Binding;
 
 public class ByteBinding implements Binding {
 
@@ -14,7 +14,7 @@ public class ByteBinding implements Binding {
 		if (statement.wasNull()) {
 			return null;
 		} else {
-			return Byte.valueOf(value);
+			return value;
 		}
 	}
 
@@ -28,7 +28,7 @@ public class ByteBinding implements Binding {
 		if (value == null) {
 			statement.setNull(index, Types.INTEGER);
 		} else {
-			statement.setByte(index, ((Byte)value).byteValue());
+			statement.setByte(index, (Byte)value);
 		}
 	}
 

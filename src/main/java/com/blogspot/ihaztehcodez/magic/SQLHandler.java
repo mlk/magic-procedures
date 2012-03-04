@@ -1,5 +1,7 @@
 package com.blogspot.ihaztehcodez.magic;
 
+import com.blogspot.ihaztehcodez.magic.utility.ConnectionProvider;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.sql.CallableStatement;
@@ -13,10 +15,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.blogspot.ihaztehcodez.magic.utility.ConnectionProvider;
-
-/** Executes the SQL specified in the database script parameter for the current method call.
-  */
+/** Executes the SQL specified in the database script parameter for the current method call. */
 class SQLHandler implements InvocationHandler {
 	private final Logger log = Logger.getLogger(getClass().getName());
 	
@@ -56,7 +55,7 @@ class SQLHandler implements InvocationHandler {
 		
 		int bindingIndex = 1;
 		Binding returnBinding = bindings.get(method.getReturnType());
-		List<Binding> paramBindings = getParamiterBindingFor(method);
+		List<Binding> paramBindings = getParametersBindingFor(method);
 		
 		Connection connection = connectionProvider.get();
 		CallableStatement statement = null;
@@ -74,13 +73,13 @@ class SQLHandler implements InvocationHandler {
 			statement.execute();
 			Object returnValue = returnBinding.getValue(statement, 1);		
 
-			if (requiresCommiting(method)) {
+			if (requiresCommitting(method)) {
 				connection.commit();
 			}
 			failed = false;
 			return returnValue; 
 		} finally {
-			if (failed && requiresCommiting(method)) {
+			if (failed && requiresCommitting(method)) {
 				connection.rollback();
 			}
 			close(statement);
@@ -94,7 +93,7 @@ class SQLHandler implements InvocationHandler {
 	 * @param method A method whom parameters you wish to bind.
 	 * @return The method of binding the parameters.
 	 */
-	private List<Binding> getParamiterBindingFor(Method method) {
+	private List<Binding> getParametersBindingFor(Method method) {
 		List<Binding> paramBindings = new ArrayList<Binding>();
 		for (Class<?> paramClazz : method.getParameterTypes()) {
 			paramBindings.add(bindings.get(paramClazz));
@@ -107,7 +106,7 @@ class SQLHandler implements InvocationHandler {
 	 * @param method The method being used.
 	 * @return true if the method should be committed.
 	 */
-	private boolean requiresCommiting(Method method) {
+	private boolean requiresCommitting(Method method) {
 		return method.getAnnotation(Commit.class) != null;
 	}
 

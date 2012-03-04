@@ -7,15 +7,13 @@ import java.sql.SQLException;
 
 /** The Glue is what sticks an interface to the database.
  * 
- * Note: In most applications you would not use this directly and instead allow the DI
- * frame
+ * Note: The end goal is to have this hidden behind DI framework specific binders.
  */
 public class Glue {
 	/** The handler that turns a method into a database procedure. */
 	private final InvocationHandler handler;
 	
-	/** @param handler The handler that turns a method into a database procedure.
-	 */
+	/** @param handler The handler that turns a method into a database procedure.  */
 	public Glue(final InvocationHandler handler) {
 		if (handler == null) {
 			throw new NullPointerException("handler is null");
@@ -29,13 +27,12 @@ public class Glue {
 	 * All methods must have the {@link DatabaseScript} annotation.
 	 * All methods must throw {@link SQLException}.
 	 * The interface can not extend anything.
-	 * 
-	 * @param <T> 
-	 * @param clazz The interface to bind. 
+	 *
+     * @param clazz The interface to bind.
 	 * @return Glued interface.
 	 */
 	public <T> T toDatabasePackage(final Class<T> clazz) {
-		validateisInterface(clazz);
+		validateIsInterface(clazz);
 		
 		validateNoParentage(clazz);
 		
@@ -51,7 +48,6 @@ public class Glue {
 
 	/** This validates that all methods throw {@link SQLException}.
 	 * 
-	 * @param <T>
 	 * @param clazz The interface to validate.
 	 * @param methods The methods to validate.
 	 */
@@ -74,7 +70,6 @@ public class Glue {
 	
 	/** This validates that all the methods have the {@link DatabaseScript} annotation.
 	 * 
-	 * @param <T>
 	 * @param clazz The interface to validate.
 	 * @param methods The methods to validate.
 	 */
@@ -95,7 +90,6 @@ public class Glue {
 
 	/** Validates that the interface does not extend any other interfaces.
 	 * 
-	 * @param <T>
 	 * @param clazz The interface to validate.
 	 */
 	private <T> void validateNoParentage(final Class<T> clazz) {
@@ -106,7 +100,6 @@ public class Glue {
 
 	/** Validates that this interface has some methods to glue.
 	 * 
-	 * @param <T>
 	 * @param clazz  The interface to validate.
 	 * @param methods The methods to validate.
 	 */
@@ -118,10 +111,9 @@ public class Glue {
 
 	/** Validate that this really is an interface.
 	 * 
-	 * @param <T>
 	 * @param clazz The interface (hopefully!) to validate.
 	 */
-	private <T> void validateisInterface(final Class<T> clazz) {
+	private <T> void validateIsInterface(final Class<T> clazz) {
 		if (!clazz.isInterface()) {
 			throw new IllegalArgumentException(clazz.getName() + " is not an interface");
 		}
