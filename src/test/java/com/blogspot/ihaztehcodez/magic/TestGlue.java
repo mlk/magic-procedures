@@ -1,52 +1,53 @@
 package com.blogspot.ihaztehcodez.magic;
 
+import org.junit.Test;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.sql.SQLException;
 
-import org.junit.Test;
 import static junit.framework.Assert.*;
-import static org.easymock.EasyMock.*;
+import static org.mockito.Mockito.mock;
 
 public class TestGlue {
 	@Test( expected = IllegalArgumentException.class)
 	public void toDatabasePackage_validatesPassedClassIsInterface() {
-		Glue glue = new Glue(createNiceMock(InvocationHandler.class));
+		Glue glue = new Glue(mock(InvocationHandler.class));
 		glue.toDatabasePackage(TestGlue.class);
 	}
 	
 	@Test( expected = IllegalArgumentException.class)
 	public void toDatabasePackage_validatesPassedInterfaceHasNoMethods() {
-		Glue glue = new Glue(createNiceMock(InvocationHandler.class));
+		Glue glue = new Glue(mock(InvocationHandler.class));
 		glue.toDatabasePackage(NoMethods.class);
 	}
 	@Test( expected = IllegalArgumentException.class)
 	public void toDatabasePackage_validatesPassedInterfaceDoesNotExtendsAnything() {
-		Glue glue = new Glue(createNiceMock(InvocationHandler.class));
+		Glue glue = new Glue(mock(InvocationHandler.class));
 		glue.toDatabasePackage(ExtendsFine.class);
 	}
 	
 	@Test( expected = IllegalArgumentException.class)
 	public void toDatabasePackage_validatesPassedInterfaceHasMethodsWithoutAnnotation() {
-		Glue glue = new Glue(createNiceMock(InvocationHandler.class));
+		Glue glue = new Glue(mock(InvocationHandler.class));
 		glue.toDatabasePackage(OneMethodsWithAnnotation.class);
 	}
 	
 	@Test( expected = IllegalArgumentException.class)
 	public void toDatabasePackage_validatesAllMethodsWithoutAnnotation() {
-		Glue glue = new Glue(createNiceMock(InvocationHandler.class));
+		Glue glue = new Glue(mock(InvocationHandler.class));
 		glue.toDatabasePackage(NoMethodsWithAnnotation.class);
 	}
 	
 	@Test( expected = IllegalArgumentException.class)
 	public void toDatabasePackage_validatesMethodsThrowSQLException() {
-		Glue glue = new Glue(createNiceMock(InvocationHandler.class));
+		Glue glue = new Glue(mock(InvocationHandler.class));
 		glue.toDatabasePackage(DoesNotThrow.class);
 	}
 	
 	@Test
 	public void toDatabasePackage_returnsProxyWhenGivenAValidInterface() {
-		InvocationHandler handler = createNiceMock(InvocationHandler.class);
+		InvocationHandler handler = mock(InvocationHandler.class);
 		Glue glue = new Glue(handler);
 		
 		Fine fine = glue.toDatabasePackage(Fine.class);

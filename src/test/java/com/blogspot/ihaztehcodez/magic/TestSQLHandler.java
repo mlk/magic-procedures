@@ -1,5 +1,9 @@
 package com.blogspot.ihaztehcodez.magic;
 
+import com.blogspot.ihaztehcodez.magic.binders.VoidBinding;
+import com.blogspot.ihaztehcodez.magic.utility.SimpleConnectionProvider;
+import org.junit.Test;
+
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -7,13 +11,10 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.junit.Test;
-
-import com.blogspot.ihaztehcodez.magic.utility.SimpleConnectionProvider;
-
-import static junit.framework.Assert.*;
-import static org.easymock.EasyMock.*;
-
+import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.fail;
+import static org.mockito.Mockito.*;
+        
 public class TestSQLHandler {
 	@Test( expected = NullPointerException.class)
 	public void ctor_rejectsNullDatabase() {
@@ -22,117 +23,77 @@ public class TestSQLHandler {
 	
 	@Test
 	public void invoke_executesStatementGivenInAnnotation() throws Throwable {
-		Connection connection = createMock(Connection.class);
-		CallableStatement statement = createMock(CallableStatement.class);
+		Connection connection = mock(Connection.class);
+		CallableStatement statement = mock(CallableStatement.class);
 		
-		expect(connection.prepareCall("SQL"))
-			.andReturn(statement);
-		expect(statement.execute()).andReturn(false);
-		
-		statement.close();
-		connection.close();
-		
-		Binding returnBinding = createMock(Binding.class);
-		expect(returnBinding.worksWith()).andReturn(new Class<?>[] { void.class } );
-		returnBinding.prepareGet(statement, 1);
-		expect(returnBinding.getValue(statement, 1)).andReturn(null);
-		expect(returnBinding.parameters()).andReturn(0);
+		when(connection.prepareCall("SQL"))
+			.thenReturn(statement);
+
+		Binding returnBinding = new VoidBinding();
 		List<Binding> bindings = new LinkedList<Binding>();
 		bindings.add(returnBinding);
-		
-		replay(connection, statement, returnBinding);
-		
+
 		SQLHandler subject = new SQLHandler(bindings, new SimpleConnectionProvider(connection));
 		assertNull(subject.invoke(null, Stubby.class.getMethod("stubby"), new Object[0]));
-		
-		verify(connection, statement, returnBinding);
+
+        verify(statement).execute();
 	}
 	
 	@Test
 	public void invoke_passesOnVariables() throws Throwable {
-		Connection connection = createMock(Connection.class);
-		CallableStatement statement = createMock(CallableStatement.class);
-		
-		expect(connection.prepareCall("SQL"))
-			.andReturn(statement);
-		expect(statement.execute()).andReturn(false);
-		
-		statement.close();
-		connection.close();
-		
+		Connection connection = mock(Connection.class);
+		CallableStatement statement = mock(CallableStatement.class);
+
+        when(connection.prepareCall("SQL"))
+                .thenReturn(statement);
+
 		List<Binding> bindings = new LinkedList<Binding>();
 		
-		Binding returnBinding = createMock(Binding.class);
-		expect(returnBinding.worksWith()).andReturn(new Class<?>[] { void.class } );
-		returnBinding.prepareGet(statement, 1);
-		expect(returnBinding.parameters()).andReturn(0);
-		expect(returnBinding.getValue(statement, 1)).andReturn(null);
+		Binding returnBinding = new VoidBinding();
 		bindings.add(returnBinding);
 		
-		Binding paramiter = createMock(Binding.class);
-		expect(paramiter.worksWith()).andReturn(new Class<?>[] { int.class } );
-		paramiter.setValue(statement, 1, 8);
-		expect(paramiter.parameters()).andReturn(1);
+		Binding paramiter = mock(Binding.class);
+		when(paramiter.worksWith()).thenReturn(new Class<?>[]{int.class});
+		
+		when(paramiter.parameters()).thenReturn(1);
 		bindings.add(paramiter);
-		
-		replay(connection, statement, returnBinding, paramiter);
-		
+
 		SQLHandler subject = new SQLHandler(bindings, new SimpleConnectionProvider(connection));
-		assertNull(subject.invoke(null, Stubby.class.getMethod("intIt", new Class<?>[] { int.class } ), 
+		assertNull(subject.invoke(null, Stubby.class.getMethod("intIt", int.class),
 				new Object[] { 8 }));
-		
-		verify(connection, statement, returnBinding, paramiter);
+
+        verify(paramiter).setValue(statement, 1, 8);
 	}
 
 	@Test
 	public void invoke_commitsOnRequest() throws Throwable {
-		Connection connection = createMock(Connection.class);
-		CallableStatement statement = createMock(CallableStatement.class);
+		Connection connection = mock(Connection.class);
+		CallableStatement statement = mock(CallableStatement.class);
+
+        when(connection.prepareCall("SQL"))
+                .thenReturn(statement);
 		
-		expect(connection.prepareCall("SQL"))
-			.andReturn(statement);
-		expect(statement.execute()).andReturn(false);
-		connection.commit();
-		statement.close();
-		connection.close();
-		
-		Binding returnBinding = createMock(Binding.class);
-		expect(returnBinding.worksWith()).andReturn(new Class<?>[] { void.class } );
-		returnBinding.prepareGet(statement, 1);
-		expect(returnBinding.getValue(statement, 1)).andReturn(null);
-		expect(returnBinding.parameters()).andReturn(0);
 		List<Binding> bindings = new LinkedList<Binding>();
-		bindings.add(returnBinding);
-		
-		replay(connection, statement, returnBinding);
-		
+		bindings.add(new VoidBinding());
+
 		SQLHandler subject = new SQLHandler(bindings, new SimpleConnectionProvider(connection));
 		assertNull(subject.invoke(null, Stubby.class.getMethod("commiting"), new Object[0]));
 		
-		verify(connection, statement, returnBinding);
+		verify(connection).commit();
 	}
 	
 	@Test
 	public void invoke_rollsbackOnRequest() throws Throwable {
-		Connection connection = createMock(Connection.class);
-		CallableStatement statement = createMock(CallableStatement.class);
-		
-		expect(connection.prepareCall("SQL"))
-			.andReturn(statement);
-		expect(statement.execute()).andThrow(new SQLException());
-		connection.rollback();
-		statement.close();
-		connection.close();
-		
-		Binding returnBinding = createMock(Binding.class);
-		expect(returnBinding.worksWith()).andReturn(new Class<?>[] { void.class } );
-		returnBinding.prepareGet(statement, 1);
-		expect(returnBinding.parameters()).andReturn(0);
+		Connection connection = mock(Connection.class);
+		CallableStatement statement = mock(CallableStatement.class);
+
+		when(connection.prepareCall("SQL"))
+			.thenReturn(statement);
+		when(statement.execute()).thenThrow(new SQLException());
+
 		List<Binding> bindings = new LinkedList<Binding>();
-		bindings.add(returnBinding);
-		
-		replay(connection, statement, returnBinding);
-		
+		bindings.add(new VoidBinding());
+
 		SQLHandler subject = new SQLHandler(bindings, new SimpleConnectionProvider(connection));
 		try {
 			assertNull(subject.invoke(null, Stubby.class.getMethod("commiting"), new Object[0]));
@@ -141,9 +102,8 @@ public class TestSQLHandler {
 			// Expected.
 		}
 		
-		verify(connection, statement, returnBinding);
+		verify(connection).rollback();
 	}
-	
 }
 
 interface Stubby {
