@@ -1,6 +1,7 @@
 package com.blogspot.ihaztehcodez.magic;
 
-import com.blogspot.ihaztehcodez.magic.utility.ConnectionProvider;
+import com.blogspot.ihaztehcodez.magic.utility.ConnectionWorker;
+import com.blogspot.ihaztehcodez.magic.utility.SQLWorker;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -23,13 +24,13 @@ class SQLHandler implements InvocationHandler {
 	private final Map<Class<?>, Binding> bindings = new HashMap<Class<?>, Binding>();
 	
 	/** Provides access to the database. */
-	private final ConnectionProvider connectionProvider;
+	private final ConnectionWorker connectionProvider;
 	
 	/** @param bindings Describes how to make use of a parameter or return type.
 	 *  @param connectionProvider Provides access to the database. 
 	 */
 	public SQLHandler(final List<Binding> bindings, 
-			final ConnectionProvider connectionProvider) {
+			final ConnectionWorker connectionProvider) {
 		
 		for (Binding binding : bindings) {
 			for(Class<?> clazz : binding.worksWith()) {
@@ -49,42 +50,51 @@ class SQLHandler implements InvocationHandler {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object invoke(Object proxy, Method method, Object[] args)
+	public Object invoke(final Object proxy, final Method method, final Object[] args)
 			throws Throwable {
-		DatabaseScript script = method.getAnnotation(DatabaseScript.class);
-		
-		int bindingIndex = 1;
-		Binding returnBinding = bindings.get(method.getReturnType());
-		List<Binding> paramBindings = getParametersBindingFor(method);
-		
-		Connection connection = connectionProvider.get();
-		CallableStatement statement = null;
-		boolean failed = true;
-		try {
-			statement = connection.prepareCall(script.value());
-			returnBinding.prepareGet(statement, 1);
-			bindingIndex += returnBinding.parameters();
-			
-			for (int i = 0; i<paramBindings.size(); i++) {
-				paramBindings.get(i).setValue(statement, bindingIndex, args[i]);
-				bindingIndex+=paramBindings.get(i).parameters();
-			}
-			
-			statement.execute();
-			Object returnValue = returnBinding.getValue(statement, 1);		
 
-			if (requiresCommitting(method)) {
-				connection.commit();
-			}
-			failed = false;
-			return returnValue; 
-		} finally {
-			if (failed && requiresCommitting(method)) {
-				connection.rollback();
-			}
-			close(statement);
-			close(connection);
-		}
+		final Object[] rtnArray = new Object[1];
+        
+		connectionProvider.execute(new SQLWorker() {
+            @Override
+            public void work(Connection connection) throws SQLException {
+                DatabaseScript script = method.getAnnotation(DatabaseScript.class);
+
+                int bindingIndex = 1;
+                Binding returnBinding = bindings.get(method.getReturnType());
+                List<Binding> paramBindings = getParametersBindingFor(method);
+
+                CallableStatement statement = null;
+                boolean failed = true;
+                try {
+                    statement = connection.prepareCall(script.value());
+                    returnBinding.prepareGet(statement, 1);
+                    bindingIndex += returnBinding.parameters();
+                    
+                    for (int i = 0; i<paramBindings.size(); i++) {
+                        paramBindings.get(i).setValue(statement, bindingIndex, args[i]);
+                        bindingIndex+=paramBindings.get(i).parameters();
+                    }
+                    
+                    statement.execute();
+                    Object returnValue = returnBinding.getValue(statement, 1);		
+        
+                    if (requiresCommitting(method)) {
+                        connection.commit();
+                    }
+                    failed = false;
+                    rtnArray[0] = returnValue;
+                } finally {
+                    if (failed && requiresCommitting(method)) {
+                        connection.rollback();
+                    }
+                    close(statement);
+                    close(connection);
+                }
+            }
+        });
+
+        return rtnArray[0];
 	}
 
 	/** For the parameters of this method determine the corresponding
