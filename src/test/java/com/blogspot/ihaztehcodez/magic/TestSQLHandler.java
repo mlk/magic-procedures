@@ -2,6 +2,7 @@ package com.blogspot.ihaztehcodez.magic;
 
 import com.blogspot.ihaztehcodez.magic.binders.VoidBinding;
 import com.blogspot.ihaztehcodez.magic.utility.SimpleConnectionWorker;
+import com.google.common.base.Suppliers;
 import org.junit.Test;
 
 import java.sql.CallableStatement;
@@ -33,7 +34,7 @@ public class TestSQLHandler {
 		List<Binding> bindings = new LinkedList<Binding>();
 		bindings.add(returnBinding);
 
-		SQLHandler subject = new SQLHandler(bindings, new SimpleConnectionWorker(connection));
+		SQLHandler subject = new SQLHandler(bindings, new SimpleConnectionWorker(Suppliers.ofInstance(connection)));
 		assertNull(subject.invoke(null, Stubby.class.getMethod("stubby"), new Object[0]));
 
         verify(statement).execute();
@@ -58,7 +59,7 @@ public class TestSQLHandler {
 		when(paramiter.parameters()).thenReturn(1);
 		bindings.add(paramiter);
 
-		SQLHandler subject = new SQLHandler(bindings, new SimpleConnectionWorker(connection));
+		SQLHandler subject = new SQLHandler(bindings, new SimpleConnectionWorker(Suppliers.ofInstance(connection)));
 		assertNull(subject.invoke(null, Stubby.class.getMethod("intIt", int.class),
 				new Object[] { 8 }));
 
@@ -76,7 +77,7 @@ public class TestSQLHandler {
 		List<Binding> bindings = new LinkedList<Binding>();
 		bindings.add(new VoidBinding());
 
-		SQLHandler subject = new SQLHandler(bindings, new SimpleConnectionWorker(connection));
+		SQLHandler subject = new SQLHandler(bindings, new SimpleConnectionWorker(Suppliers.ofInstance(connection)));
 		assertNull(subject.invoke(null, Stubby.class.getMethod("committing"), new Object[0]));
 		
 		verify(connection).commit();
@@ -94,7 +95,7 @@ public class TestSQLHandler {
 		List<Binding> bindings = new LinkedList<Binding>();
 		bindings.add(new VoidBinding());
 
-		SQLHandler subject = new SQLHandler(bindings, new SimpleConnectionWorker(connection));
+		SQLHandler subject = new SQLHandler(bindings, new SimpleConnectionWorker(Suppliers.ofInstance(connection)));
 		try {
 			assertNull(subject.invoke(null, Stubby.class.getMethod("committing"), new Object[0]));
 			fail("Expected SQL exception");
