@@ -8,7 +8,9 @@ import org.hibernate.jdbc.Work;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-/** Hibernate compatible connection worker. */
+/**
+ * Hibernate compatible connection worker.
+ */
 public class HibernateConnectionWorker implements ConnectionWorker {
     private final Supplier<Session> sessionSupplier;
 
@@ -26,8 +28,8 @@ public class HibernateConnectionWorker implements ConnectionWorker {
                     worker.work(new UnclosableConnectionWrapper(connection));
                 }
             });
-        } catch(HibernateException he) {
-            if(he.getCause() instanceof SQLException) {
+        } catch (HibernateException he) {
+            if (he.getCause() instanceof SQLException) {
                 throw (SQLException) he.getCause();
             }
             throw he;

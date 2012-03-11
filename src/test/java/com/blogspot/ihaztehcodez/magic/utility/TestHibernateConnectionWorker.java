@@ -1,7 +1,7 @@
 package com.blogspot.ihaztehcodez.magic.utility;
 
 import com.google.common.base.Suppliers;
-import org.hibernate.*;
+import org.hibernate.Session;
 import org.junit.Test;
 
 import java.sql.Connection;
@@ -46,7 +46,7 @@ public class TestHibernateConnectionWorker {
 
         verify(connection, never()).close();
     }
-    
+
     @Test
     public void execute_sqlExceptionsUnwrapped() throws SQLException {
         final Connection connection = mock(Connection.class);
@@ -64,7 +64,7 @@ public class TestHibernateConnectionWorker {
                     throw expected;
                 }
             });
-        } catch(Exception e) {
+        } catch (Exception e) {
             actual = e;
         }
 

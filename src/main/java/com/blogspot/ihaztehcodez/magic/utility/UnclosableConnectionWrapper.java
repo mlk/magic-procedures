@@ -4,7 +4,9 @@ import java.sql.*;
 import java.util.Map;
 import java.util.Properties;
 
-/** A connection that eats any attempts to close it. */
+/**
+ * A connection that eats any attempts to close it.
+ */
 class UnclosableConnectionWrapper implements Connection {
     private final Connection wrapped;
 

@@ -3,6 +3,9 @@ package com.blogspot.ihaztehcodez.magic;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-/** This annotation tells <i>the magic</i> that the transaction should before returning. */
+/**
+ * This annotation tells <i>the magic</i> that the transaction should before returning.
+ */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Commit { }
+public @interface Commit {
+}

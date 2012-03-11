@@ -10,8 +10,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
-  * A session that runs the Work with the given connection.
+ * A session that runs the Work with the given connection.
  */
+@SuppressWarnings("deprecation")
 class PassWorkOnSession implements Session {
     private final Connection connection;
 
