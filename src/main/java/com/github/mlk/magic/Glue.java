@@ -1,4 +1,4 @@
-package com.blogspot.ihaztehcodez.magic;
+package com.github.mlk.magic;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

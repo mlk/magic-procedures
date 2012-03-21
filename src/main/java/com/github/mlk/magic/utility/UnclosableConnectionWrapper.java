@@ -1,4 +1,4 @@
-package com.blogspot.ihaztehcodez.magic.utility;
+package com.github.mlk.magic.utility;
 
 import java.sql.*;
 import java.util.Map;

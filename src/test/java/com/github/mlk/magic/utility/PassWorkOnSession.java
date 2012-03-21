@@ -1,4 +1,4 @@
-package com.blogspot.ihaztehcodez.magic.utility;
+package com.github.mlk.magic.utility;
 
 import org.hibernate.*;
 import org.hibernate.jdbc.ReturningWork;

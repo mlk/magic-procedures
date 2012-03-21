@@ -1,4 +1,4 @@
-package com.blogspot.ihaztehcodez.magic;
+package com.github.mlk.magic;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

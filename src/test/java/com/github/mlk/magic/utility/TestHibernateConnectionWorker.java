@@ -1,4 +1,4 @@
-package com.blogspot.ihaztehcodez.magic.utility;
+package com.github.mlk.magic.utility;
 
 import com.google.common.base.Suppliers;
 import org.hibernate.Session;

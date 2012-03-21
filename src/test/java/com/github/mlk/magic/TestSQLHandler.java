@@ -1,7 +1,7 @@
-package com.blogspot.ihaztehcodez.magic;
+package com.github.mlk.magic;
 
-import com.blogspot.ihaztehcodez.magic.binders.VoidBinding;
-import com.blogspot.ihaztehcodez.magic.utility.SimpleConnectionWorker;
+import com.github.mlk.magic.binders.VoidBinding;
+import com.github.mlk.magic.utility.SimpleConnectionWorker;
 import com.google.common.base.Suppliers;
 import org.junit.Test;
 

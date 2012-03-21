@@ -1,6 +1,6 @@
-package com.blogspot.ihaztehcodez.magic.binders;
+package com.github.mlk.magic.binders;
 
-import com.blogspot.ihaztehcodez.magic.Binding;
+import com.github.mlk.magic.Binding;
 
 import java.sql.CallableStatement;
 import java.sql.SQLException;

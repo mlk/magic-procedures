@@ -1,7 +1,7 @@
-package com.blogspot.ihaztehcodez.magic;
+package com.github.mlk.magic;
 
-import com.blogspot.ihaztehcodez.magic.utility.ConnectionWorker;
-import com.blogspot.ihaztehcodez.magic.utility.SQLWorker;
+import com.github.mlk.magic.utility.ConnectionWorker;
+import com.github.mlk.magic.utility.SQLWorker;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

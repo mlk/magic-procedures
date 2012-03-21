@@ -1,16 +1,16 @@
-package com.blogspot.ihaztehcodez.magic.binders;
+package com.github.mlk.magic.binders;
 
-import com.blogspot.ihaztehcodez.magic.Binding;
+import com.github.mlk.magic.Binding;
 
 import java.sql.CallableStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 
-public class ByteBinding implements Binding {
+public class IntBinding implements Binding {
 
     @Override
     public Object getValue(CallableStatement statement, int index) throws SQLException {
-        byte value = statement.getByte(index);
+        int value = statement.getInt(index);
         if (statement.wasNull()) {
             return null;
         } else {
@@ -28,17 +28,18 @@ public class ByteBinding implements Binding {
         if (value == null) {
             statement.setNull(index, Types.INTEGER);
         } else {
-            statement.setByte(index, (Byte) value);
+            statement.setInt(index, (Integer) value);
         }
     }
 
     @Override
     public Class<?>[] worksWith() {
-        return new Class<?>[]{Byte.class, byte.class};
+        return new Class<?>[]{Integer.class, int.class};
     }
 
     @Override
     public int parameters() {
         return 1;
     }
+
 }
